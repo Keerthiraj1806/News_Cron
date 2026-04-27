@@ -1,0 +1,28 @@
+# .github/workflows/fetch-news.yml
+name: Fetch News Data
+on:
+  schedule:
+    - cron: '0 7 * * *'   # Every day at 7 AM UTC
+  workflow_dispatch:        # Manual trigger for testing
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Fetch top headlines
+        run: |
+          curl -s "https://newsapi.org/v2/top-headlines?country=in&pageSize=20&apiKey=${{ [secrets.NEWS](http://secrets.NEWS)_API_KEY }}" \
+            -o news.json
+      - name: Show fetched articles (for debugging)
+        run: |
+          cat news.json | python3 -m json.tool | head -60
+      - name: Save news to repo
+        run: |
+          mkdir -p data
+          mv news.json data/news-$(date +%Y-%m-%d).json
+          git config [user.name](http://user.name) "github-actions[bot]"
+          git config [user.email](http://user.email) "github-actions[bot]@[users.noreply.github.com](http://users.noreply.github.com)"
+          git add data/
+          git commit -m "chore: news data $(date +%Y-%m-%d)" || echo "No changes"
+          git push
