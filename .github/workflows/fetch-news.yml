@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       - name: Fetch top headlines
         run: |
           curl -s "https://newsapi.org/v2/top-headlines?country=in&pageSize=20&apiKey=${{ secrets.NEWS_API_KEY }}" \
@@ -21,8 +24,8 @@ jobs:
         run: |
           mkdir -p data
           mv news.json data/news-$(date +%Y-%m-%d).json
-          git config [user.name](http://user.name) "github-actions[bot]"
-          git config [user.email](http://user.email) "github-actions[bot]@[users.noreply.github.com](http://users.noreply.github.com)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
           git commit -m "chore: news data $(date +%Y-%m-%d)" || echo "No changes"
           git push
